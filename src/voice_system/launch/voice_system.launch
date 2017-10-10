@@ -1,0 +1,11 @@
+<launch>
+
+	<node pkg="voice_system" name="xf_tts_node" type="xf_tts_node"/>
+
+
+	<node pkg="voice_system" name="tuling_nlu_node" type="tuling_nlu_node"/>
+
+
+	<node pkg="voice_system" name="xf_asr_node" type="xf_asr_node"/>
+
+</launch>

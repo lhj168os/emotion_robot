@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+'''
+人脸识别检查开始
+
+
+'''
+# 引入人脸识别 SDK
+from aip import AipFace
+import rospy
+from std_msgs.msg import String
+import os
+# 定义常量
+APP_ID = 'dcbae333366e48829fd32340f0e0ef51'
+API_KEY = 'a843a46a682645e1a22cec6c3df54344'
+SECRET_KEY = 'e1426b8a216c441b8e97cf0f9d6a4098'
+
+# 读取图片
+def get_file_content(filePath):
+    with open(filePath, 'rb') as fp:
+        return fp.read()
+
+# 初始化AipFace对象
+aipFace = AipFace(APP_ID, API_KEY, SECRET_KEY)
+
+
+def cmpface():
+	imgno = 1000
+	while True:	
+		mid=imgno
+		mid="src/face_system/image/"+str(mid)+".jpg"
+		#print mid
+		#print os.getcwd();
+		# 调用人脸两两比对接口
+		#print mid
+		try:
+			result = aipFace.match([
+			    get_file_content('src/face_system/image/new.jpg'),
+			    get_file_content(mid),
+			    #get_file_content('me.jpg'),
+			])
+		except :
+			print "i don't know you!"
+			return 0
+		#print result
+		#print result['results']
+		ret=result['results']
+		ret=ret[0]
+		#ret['score']	
+		print imgno,"相似度为：",ret['score']
+		if ret['score'] >= 85:
+			#print "this is:",imgno
+			res = {'num':imgno,'ret':ret['score']}
+			return res
+		else :
+ 			res = {'num':0,'ret':0}
+                        imgno+=1
+
+
+
+"""def talker(sent_msg):
+	#bresult = call_baidu_aip()                                                 
+	pub = rospy.Publisher('xf_tts_node',String,queue_size=10)
+	rospy.init_node('talker')
+	#rospy.init_node('talker',anonymous=True)	
+	rate = rospy.Rate(1)   #10Hz
+	while not rospy.is_shutdown():
+		#hello_str = "now you are here: %s " % os.getcwd()
+		#hello_str = "hello world like:%s " % rospy.get_time()#bresult
+		rospy.loginfo(sent_msg)
+		pub.publish(sent_msg)
+		rate.sleep()
+
+"""
+
+
+
+if __name__ == '__main__':
+	student = cmpface()
+
+	if(student!=0):
+		#print "you are :",student['num']
+		print "相似度 :",student['ret']
+		filename = "src/face_system/data/"+str(student['num'])+".txt"
+		#print filename
+		rs = open(filename,"r") 
+		openfile =rs.read()	
+		rs.close()
+		#print  student
+		#print	
+	else:
+		print "i don't know you!"
+		openfile ="你长得太帅了，还没认识你是我的遗憾！你叫什么名字？我可以认识你吗？"
+        
+        #openfile = "\'"+openfile+"\'"
+        #talker(openfile)
+        #src="rostopic pub -1 /voice/vs_start_topic std_msgs/String %s 1"% openfile
+        print openfile
+        os.system("rostopic pub -1 /voice/xf_tts_topic std_msgs/String \'%s\'"%openfile) 
+	
+	
+
+
+
+
+
+
+
+
+
+
+
